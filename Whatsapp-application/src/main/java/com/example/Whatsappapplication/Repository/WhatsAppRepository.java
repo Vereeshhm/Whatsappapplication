@@ -11,3 +11,4 @@ import com.example.Whatsappapplication.Entity.Saswatdto;
 public interface WhatsAppRepository extends JpaRepository<Saswatdto, Integer>{
 
 }
+

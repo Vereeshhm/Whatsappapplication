@@ -2,17 +2,28 @@ package com.example.Whatsappapplication.ServiceImpl;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 //import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
+
 
 import com.example.Whatsappapplication.Entity.Saswatdto;
 import com.example.Whatsappapplication.Repository.WhatsAppRepository;
@@ -20,11 +31,14 @@ import com.example.Whatsappapplication.Repository.WhatsAppRepository;
 import com.example.Whatsappapplication.Service.WhatsappService;
 
 import com.example.Whatsappapplication.ServiceResponse.WhatsaAppResponse;
+import com.example.Whatsappapplication.utils.PropertiesConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
 //import com.fasterxml.jackson.core.JsonProcessingException;
 //import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -33,48 +47,48 @@ import jakarta.transaction.Transactional;
 public class WhatsappServiceImpl implements WhatsappService {
 
 	@Autowired
-	WhatsAppRepository whatsAppRepository;
-//	
-//	
-	@Autowired
-	RestTemplate restTemplate;
-	// private WhatsaAppResponse whatsappResponse;
+	PropertiesConfig propertiesConfig;
+
+
+	private final JdbcTemplate jdbcTemplate;
+
+	public WhatsappServiceImpl(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
 
 	@Override
-	public WhatsaAppResponse getEmiNotification(Saswatdto dto) {
-		WhatsaAppResponse whatsappResponse = new WhatsaAppResponse();
+	public ResponseEntity<Saswatdto> getRecordsByMobileNumber(String mobile_no) throws IOException {
 
-		// Status status=new Status();
+		String query = "SELECT customer_name, emi_amt, saswat_loan_number, emi_date, mobile_no FROM loandetailss WHERE mobile_no = ?";
 
-		try {
+		List<Saswatdto> results = jdbcTemplate.query(query, ps -> ps.setString(1, mobile_no), new SaswatdtoRowMapper());
 
-			String basURl = "https://api.wab.ai/whatsapp-api/v1.0/customer/95106/bot/fb07e17049ff432d/template";
+		if (results.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		} else {
+			 //return ResponseEntity.ok(results.get(0));
+			Saswatdto dto = results.get(0);
 
-			String name = dto.getName();
-			long amount = dto.getAmount();
-			Long loan = dto.getLoan();
-			
-			String formattedDate=dto.getFormattedDate();
+			String customer_name = dto.getCustomer_name();
+			String emi_amt = dto.getEmi_amt();
+			String saswat_loan_number = dto.getSaswat_loan_number();
 
-			String number = dto.getNumber();
+			String emi_date = dto.getEmi_date();
+			String baseUrl = propertiesConfig.getRecieveBaseURL();
+			String fullURL = String.format("%s?customer_name=%s&emi_amt=%s&saswat_loan_number=%s&emi_date=%s&number=%s",
+					baseUrl, customer_name, emi_amt, saswat_loan_number, emi_date, mobile_no);
 
-			// construct payload json
 			ObjectMapper objectMapper = new ObjectMapper();
-
-			// Define the payload data
+			// Construct the payload JSON string
 			String payloadJson = "{\"payload\":{\"name\":\"emi_received\",\"components\":[{\"type\":\"body\",\"parameters\":[{\"type\":\"text\",\"text\":\""
-					+ name + "\"},{\"type\":\"text\",\"text\":\"" + amount + "\"},{\"type\":\"text\",\"text\":\"" + loan
-					+ "\"},{\"type\":\"text\",\"text\":\"" + formattedDate
+					+ dto.getCustomer_name() + "\"},{\"type\":\"text\",\"text\":\"" + dto.getEmi_amt()
+					+ "\"},{\"type\":\"text\",\"text\":\"" + dto.getSaswat_loan_number()
+					+ "\"},{\"type\":\"text\",\"text\":\"" + dto.getEmi_date()
 					+ "\"}]}],\"language\":{\"code\":\"en_US\",\"policy\":\"deterministic\"},\"namespace\":\"ef357b92_0da8_4375_b8fb_6a09202df2bc\"},\"phoneNumber\":\""
-					+ number + "\"}";
-
-			String fullURL = String.format("%s?name=%s&amount=%d&loan=%d&formattedDate=%s&number=%s", basURl, name,
-					amount, loan, formattedDate, number);
-			// setup the connection
-
+					+ dto.getMobile_no() + "\"}";
 			URL url = new URL(fullURL);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("POST");
+			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Authorization", "Basic 3b6bdb88-58b8-4e80-af2f-5f7c055d6cf0-HkDULO5");
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setDoOutput(true);
@@ -95,63 +109,40 @@ public class WhatsappServiceImpl implements WhatsappService {
 
 			JsonNode jsonResponse = objectMapper.readTree(response.toString());
 
-			// Construct and return the response object
+			// Here you can use the payloadJson string to send the message to WhatsApp
+			// Assuming you have a method to send the payload to WhatsApp
 
-			// whatsappResponse.setResponseObject(new
-			// ResponseObject(jsonResponse.get("responseObject").get("message_id").asText()));
-//	       whatsappResponse.setStatus( new Status(jsonResponse.get("status").get("code").asInt()));
-//	       whatsappResponse.setStatus( new Status(jsonResponse.get("status").get("desc").asText()));
-//	       String messageId=jsonResponse.get("responseObject").get("message_id").asText();
-//	       whatsappResponse.setResponseObject(new ResponseObject(messageId));
-			int statusCode = jsonResponse.get("status").get("code").asInt();
-			String statusDesc = jsonResponse.get("status").get("desc").asText();
+			// Return the ResponseEntity with the Saswatdto object
 
-			if (statusCode == 1000) {
-
-				if (loan != null && String.valueOf(loan).length() == 14) {
-					if (number != null && number.length() == 10 && number.matches("\\d+")) {
-
-						Saswatdto entity = new Saswatdto();
-
-						entity.setName(dto.getName());
-						entity.setAmount(dto.getAmount());
-
-						entity.setFormattedDate(dto.getFormattedDate());
-						
-						entity.setLoan(dto.getLoan());
-						entity.setNumber(dto.getNumber());
-
-						whatsAppRepository.save(entity);
-
-						whatsappResponse.setDesc("SUCCESS");
-						whatsappResponse.setStatus("sent successfully");
-
-					} else {
-						whatsappResponse.setDesc("Failed");
-
-						whatsappResponse.setStatus("Failed to send - phone number must be 10 digits");
-
-					}
-				} else {
-					whatsappResponse.setDesc("Failed");
-					whatsappResponse.setStatus("Failed to send -  loan number must be exactly 14 digits");
-
-				}
-			} else {
-				whatsappResponse.setStatus("Failed to send");
-			}
-
-			whatsappResponse.setCode(statusCode);
-		 // whatsappResponse.setDesc(statusDesc);
-
-			outputStream.close();
+			return ResponseEntity.ok(dto);
 		}
+	}
 
-		catch (Exception e) {
-			e.printStackTrace();
+	private static class SaswatdtoRowMapper implements RowMapper<Saswatdto> {
+		@Override
+		public Saswatdto mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Saswatdto dto = new Saswatdto();
+			// Map ResultSet columns to DTO fields
+			dto.setEmi_amt(rs.getString("emi_amt"));
+			dto.setSaswat_loan_number(rs.getString("saswat_loan_number"));
+			dto.setEmi_date(rs.getString("emi_date"));
+			dto.setMobile_no(rs.getString("mobile_no"));
+		    dto.setCustomer_name(rs.getString("customer_name"));
+		    
+
+	   
+		    
+		   
+			return dto;
 		}
-		return whatsappResponse;
+		  
 
 	}
 
+
 }
+
+
+
+
+

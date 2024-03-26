@@ -7,40 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 public class WhatsaAppResponse {
-  //  private ResponseObject responseObject;
-     // private Status status;
 
-//    public ResponseObject getResponseObject() {
-//        return responseObject;
-//    }
-//
-//    @JsonProperty("responseObject")
-//    public void setResponseObject(ResponseObject responseObject) {
-//        this.responseObject = responseObject;
-//    }
-
-//    public Status getStatus() {
-//        return status;
-//    }
-//
-//    @JsonProperty("status")
-//    public void setStatus(Status status) {
-//        this.status = status;
-//    }
-////
-////    // Optional: You can override the toString() method to print the object.
-//    @Override
-//    public String toString() {
-//        return "WhatsaAppResponse{" +
-////                "responseObject=" + responseObject +
-//                ", status=" + status +
-//                '}';
-//    }
-
-	
-//	public void setStatus(com.example.Whatsappapplication.ServiceResponse.Status status2) {
-//		
-//	}
 	
 	
 	
@@ -49,15 +16,9 @@ public class WhatsaAppResponse {
     private String desc;
     private String status;
 
-//    public Status(String code, String desc) {
-//        this.code = code;
-//        this.desc = desc;
-//    }
 
 
 	
-	
-
 
 	public int getCode() {
         return code;
