@@ -1,14 +1,19 @@
 package com.example.Whatsappapplication;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+
 import org.springframework.boot.test.context.SpringBootTest;
 
+
+
+
 @SpringBootTest
-class WhatsappApplicationTests {
+public class WhatsappApplicationTests {
 
-	@Test
 
-	void contextLoads() {
+
+   @Test
+    public void contextLoads() {
 	}
 
 }

@@ -8,28 +8,25 @@ import java.time.format.DateTimeFormatter;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Pattern;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 
 
-@Entity
-@Table(name="loandetailss")
+@javax.persistence.Entity
+@javax.persistence.Table(name="loandetailss")
 public class Saswatdto {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	
+	@javax.persistence.GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
 	
 	
 
-	
-	 @javax.validation.constraints.Pattern(regexp = "^\\d{10}$", message = "Phone number must be 10 digits")
-	 @Column(name="mobile_no")
+	@Column(name="mobile_no")
 	private String mobile_no;
 	
 	 @Column(name="emi_amt")
@@ -89,6 +86,12 @@ public class Saswatdto {
 
 	public void setSaswat_loan_number(String saswat_loan_number) {
 		this.saswat_loan_number = saswat_loan_number;
+	}
+
+	@Override
+	public String toString() {
+		return "Saswatdto [mobile_no=" + mobile_no + ", emi_amt=" + emi_amt + ", saswat_loan_number="
+				+ saswat_loan_number + ", customer_name=" + customer_name + ", emi_date=" + emi_date + "]";
 	}
 
 

@@ -1,9 +1,4 @@
-package com.example.Whatsappapplication.Entity;
-
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-
-import javax.validation.constraints.Pattern;
+package com.example.Whatsappapplication.dto;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,17 +6,19 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+@Entity
+@Table(name="loanreminder")
+public class Reminderdata {
 
-@javax.persistence.Entity
-@javax.persistence.Table(name="loandetailss")
-public class Reminderdto {
-
-    @Id
-	@javax.persistence.GeneratedValue(strategy = GenerationType.AUTO)
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	
+	private int id;
 	
 	private String mobile_no;
 	
-
+	
 	private String saswat_loan_number;
 	
 	
@@ -31,8 +28,16 @@ public class Reminderdto {
 	private String emi_date;
 
 
-	
-	
+	public int getId() {
+		return id;
+	}
+
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+
 	public String getMobile_no() {
 		return mobile_no;
 	}
@@ -53,10 +58,6 @@ public class Reminderdto {
 	}
 
 
-
-
-
-
 	public String getCustomer_name() {
 		return customer_name;
 	}
@@ -75,17 +76,7 @@ public class Reminderdto {
 	public void setEmi_date(String emi_date) {
 		this.emi_date = emi_date;
 	}
-
-
-	@Override
-	public String toString() {
-		return "Reminderdto [mobile_no=" + mobile_no + ", saswat_loan_number=" + saswat_loan_number + ", customer_name="
-				+ customer_name + ", emi_date=" + emi_date + "]";
-	}
-
-
-
 	
 	
-	
+
 }

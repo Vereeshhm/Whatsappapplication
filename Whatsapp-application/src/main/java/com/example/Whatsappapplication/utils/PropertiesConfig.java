@@ -10,8 +10,8 @@ import org.springframework.context.annotation.PropertySource;
 public class PropertiesConfig {
 
 	
-	@Value("${Recieve.baseURl}")
-	private String RecieveBaseURL;
+	@Value("${Recieve.baseURl}")                      
+	private String RecieveBaseURL;            
 	
 	@Value("${Reminder.baseURl}")
 	private String ReminderBaseURL;
